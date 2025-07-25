@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -10,6 +11,7 @@ import { ingestVulnerabilityData } from "@/ai/flows/ingest-vulnerability-data";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useApp } from "@/context/app-context";
 
 export default function IngestPage() {
   const [source, setSource] = useState("NVD");
@@ -17,6 +19,7 @@ export default function IngestPage() {
   const [result, setResult] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { addVulnerabilities } = useApp();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,10 +39,14 @@ export default function IngestPage() {
       const response = await ingestVulnerabilityData({ source, data });
       if (response.success) {
         setResult(response);
+        const parsedData = JSON.parse(response.normalizedData);
+        addVulnerabilities(Array.isArray(parsedData) ? parsedData : [parsedData]);
+
         toast({
           title: "Success",
           description: "Vulnerability data ingested and normalized successfully.",
         });
+        setData("");
       } else {
         throw new Error(response.message || "Ingestion failed.");
       }

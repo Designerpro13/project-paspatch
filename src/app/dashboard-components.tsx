@@ -1,3 +1,4 @@
+
 // src/app/dashboard-components.tsx
 "use client";
 
@@ -22,6 +23,8 @@ import {
   ChartContainer,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useApp } from "@/context/app-context";
+import { AlertCircle } from "lucide-react";
 
 const chartConfig = {
   count: {
@@ -49,6 +52,7 @@ export function VulnerabilityChart({ data }: { data: any[] }) {
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
             tickFormatter={(value) => `${value}`}
+            allowDecimals={false}
           />
           <Tooltip
             cursor={false}
@@ -61,40 +65,9 @@ export function VulnerabilityChart({ data }: { data: any[] }) {
   );
 }
 
-const patches = [
-  {
-    cve: "CVE-2023-4567",
-    asset: "WebServer-01",
-    severity: "Critical",
-    service: "Apache/2.4.57",
-  },
-  {
-    cve: "CVE-2023-5824",
-    asset: "DB-Server-03",
-    severity: "Critical",
-    service: "MySQL 8.0.31",
-  },
-  {
-    cve: "CVE-2023-3390",
-    asset: "Kernel-All",
-    severity: "High",
-    service: "Linux Kernel 5.10",
-  },
-  {
-    cve: "CVE-2023-2949",
-    asset: "Win-Client-42",
-    severity: "High",
-    service: "OpenSSH 8.9p1",
-  },
-    {
-    cve: "CVE-2023-50164",
-    asset: "AppServer-02",
-    severity: "High",
-    service: "Struts 2.5.32",
-  },
-];
-
 export function HighPriorityPatchesTable() {
+  const { patches } = useApp();
+
   const getBadgeVariant = (severity: string) => {
     switch (severity) {
       case "Critical":
@@ -106,27 +79,35 @@ export function HighPriorityPatchesTable() {
     }
   };
 
+  if (patches.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-8">
+        <AlertCircle className="size-10 mb-4" />
+        <h3 className="font-semibold">No Patches Prioritized</h3>
+        <p className="text-sm">Run the patch prioritizer to see recommended patches here.</p>
+      </div>
+    )
+  }
+
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>CVE</TableHead>
-          <TableHead>Asset</TableHead>
+          <TableHead>Priority</TableHead>
           <TableHead>Service</TableHead>
-          <TableHead className="text-right">Severity</TableHead>
+          <TableHead>Recommendation</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {patches.map((patch) => (
-          <TableRow key={patch.cve}>
-            <TableCell className="font-medium">{patch.cve}</TableCell>
-            <TableCell>{patch.asset}</TableCell>
-            <TableCell>{patch.service}</TableCell>
-            <TableCell className="text-right">
-              <Badge variant={getBadgeVariant(patch.severity)}>
-                {patch.severity}
+        {patches.filter(p => p.priority === "Critical" || p.priority === "High").map((patch, index) => (
+          <TableRow key={index}>
+            <TableCell>
+              <Badge variant={getBadgeVariant(patch.priority)}>
+                {patch.priority}
               </Badge>
             </TableCell>
+            <TableCell>{patch.service}</TableCell>
+            <TableCell>{patch.recommendedPatch}</TableCell>
           </TableRow>
         ))}
       </TableBody>

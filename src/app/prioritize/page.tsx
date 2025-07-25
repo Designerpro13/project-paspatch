@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -11,12 +12,31 @@ import { prioritizePatches, PrioritizePatchesOutput } from "@/ai/flows/prioritiz
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useApp } from "@/context/app-context";
 
 export default function PrioritizePage() {
   const [nmapScanResult, setNmapScanResult] = useState("");
   const [result, setResult] = useState<PrioritizePatchesOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { assets, addPatches } = useApp();
+  
+  useEffect(() => {
+    if (assets.length > 0) {
+      const xml = `<nmaprun>
+        <host>
+          <ports>
+            ${assets.map(asset => `<port protocol="${asset.protocol}" portid="${asset.port}">
+              <state state="open"/>
+              <service name="${asset.serviceName}" version="${asset.serviceVersion}"/>
+            </port>`).join('\n')}
+          </ports>
+        </host>
+      </nmaprun>`;
+      setNmapScanResult(xml);
+    }
+  }, [assets]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,9 +55,10 @@ export default function PrioritizePage() {
     try {
       const response = await prioritizePatches({ nmapScanResult });
       setResult(response);
+      addPatches(response);
       toast({
         title: "Success",
-        description: "Patch prioritization complete.",
+        description: "Patch prioritization complete. Dashboard updated.",
       });
     } catch (error: any) {
       console.error("Prioritization error:", error);
@@ -72,18 +93,19 @@ export default function PrioritizePage() {
             <CardHeader>
               <CardTitle>Intelligent Patch Prioritization</CardTitle>
               <CardDescription>
-                Use Nmap scan data to identify outdated services and generate a prioritized list of patch recommendations.
+                Use Nmap scan data from the Scan Parser to generate a prioritized list of patch recommendations. The dashboard will update with the results.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="nmapScanResult">Nmap Scan Result (XML)</Label>
+                <Label htmlFor="nmapScanResult">Nmap Scan Result (XML from parsed assets)</Label>
                 <Textarea
                   id="nmapScanResult"
                   value={nmapScanResult}
                   onChange={(e) => setNmapScanResult(e.target.value)}
                   placeholder="<nmaprun>...</nmaprun>"
                   className="min-h-[250px] font-mono"
+                  readOnly={assets.length > 0}
                 />
               </div>
             </CardContent>

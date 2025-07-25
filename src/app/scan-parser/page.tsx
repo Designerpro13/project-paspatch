@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -11,12 +12,14 @@ import { parseNmapServiceScan, ParseNmapServiceScanOutput } from "@/ai/flows/par
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useApp } from "@/context/app-context";
 
 export default function ScanParserPage() {
   const [xmlData, setXmlData] = useState("");
   const [result, setResult] = useState<ParseNmapServiceScanOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { addAssets } = useApp();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,10 +38,12 @@ export default function ScanParserPage() {
     try {
       const response = await parseNmapServiceScan({ xmlData });
       setResult(response);
+      addAssets(response.services);
       toast({
         title: "Success",
         description: "Nmap scan parsed successfully.",
       });
+      setXmlData("");
     } catch (error: any) {
       console.error("Parsing error:", error);
       toast({
@@ -59,7 +64,7 @@ export default function ScanParserPage() {
             <CardHeader>
               <CardTitle>Nmap Service Scan Parser</CardTitle>
               <CardDescription>
-                Paste the XML output from an Nmap scan to have the AI extract and summarize the discovered services.
+                Paste the XML output from an Nmap scan to have the AI extract and summarize the discovered services. The results will be added to the asset inventory.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -132,3 +137,4 @@ export default function ScanParserPage() {
     </div>
   );
 }
+
