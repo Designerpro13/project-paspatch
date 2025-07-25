@@ -1,3 +1,4 @@
+// src/app/dashboard-components.tsx
 "use client";
 
 import {
@@ -22,13 +23,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const chartData = [
-  { severity: "Low", count: 186 },
-  { severity: "Medium", count: 305 },
-  { severity: "High", count: 237 },
-  { severity: "Critical", count: 89 },
-];
-
 const chartConfig = {
   count: {
     label: "Count",
@@ -36,11 +30,11 @@ const chartConfig = {
   },
 };
 
-export function VulnerabilityChart() {
+export function VulnerabilityChart({ data }: { data: any[] }) {
   return (
     <ChartContainer config={chartConfig} className="h-[250px] w-full">
       <ResponsiveContainer>
-        <BarChart data={chartData} accessibilityLayer>
+        <BarChart data={data} accessibilityLayer>
           <XAxis
             dataKey="severity"
             tickLine={false}

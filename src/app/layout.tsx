@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AppLayout } from "@/components/layout";
 import { Toaster } from "@/components/ui/toaster";
+import { AppProvider } from "@/context/app-context";
+
 
 export const metadata: Metadata = {
   title: "PatchWise",
@@ -24,8 +26,10 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
-        <AppLayout>{children}</AppLayout>
-        <Toaster />
+        <AppProvider>
+          <AppLayout>{children}</AppLayout>
+          <Toaster />
+        </AppProvider>
       </body>
     </html>
   );

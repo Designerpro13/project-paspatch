@@ -27,9 +27,12 @@ import {
   User,
   LogOut,
   Settings,
+  Moon,
+  Sun,
+  Laptop,
 } from "lucide-react";
 import * as React from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Logo } from "./icons";
 import { Button } from "./ui/button";
@@ -40,9 +43,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "./ui/badge";
+import { useApp } from "@/context/app-context";
+import { Label } from "./ui/label";
+import { Switch } from "./ui/switch";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -80,9 +90,92 @@ function DateTime() {
     )
 }
 
+function UserMenu() {
+    const { logout, isDemoMode, toggleDemoMode } = useApp();
+    const router = useRouter();
+
+    const handleLogout = () => {
+        logout();
+        router.push('/login');
+    }
+
+    return (
+         <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="secondary" size="icon" className="rounded-full">
+                  <Avatar>
+                    <AvatarFallback>A</AvatarFallback>
+                  </Avatar>
+                  <span className="sr-only">Toggle user menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuLabel className="flex flex-col">
+                  <span className="font-semibold">Admin</span>
+                  <span className="text-xs font-normal text-muted-foreground">
+                    admin@patchwise.co
+                  </span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="flex-col items-start gap-2">
+                    <div className="flex items-center justify-between w-full">
+                         <Label htmlFor="demo-mode" className="font-normal flex items-center gap-2 cursor-pointer">
+                            <Badge variant={isDemoMode ? "secondary" : "outline"}>
+                                {isDemoMode ? "DEMO" : "ACTUAL"}
+                            </Badge>
+                            <span>Mode</span>
+                        </Label>
+                        <Switch id="demo-mode" checked={isDemoMode} onCheckedChange={toggleDemoMode} />
+                    </div>
+                    <p className="text-xs text-muted-foreground">Toggle to see sample data.</p>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+    )
+}
+
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useApp();
 
+  React.useEffect(() => {
+    if (!isLoading && !isAuthenticated && pathname !== '/login') {
+      router.push('/login');
+    }
+  }, [isAuthenticated, isLoading, pathname, router]);
+
+
+  if (pathname === '/login') {
+    return <>{children}</>
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center">
+        <Logo className="size-10 animate-pulse" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
+  
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
@@ -113,11 +206,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         <SidebarFooter className="p-4">
             <div className="flex items-center gap-2">
                  <Avatar className="size-8">
-                    <AvatarFallback>N</AvatarFallback>
+                    <AvatarFallback>A</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-                    <span className="text-sm font-semibold">Demo User</span>
-                    <span className="text-xs text-muted-foreground">demo@patchwise.co</span>
+                    <span className="text-sm font-semibold">Admin</span>
+                    <span className="text-xs text-muted-foreground">admin@patchwise.co</span>
                 </div>
             </div>
         </SidebarFooter>
@@ -141,40 +234,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex items-center gap-4">
             <DateTime />
-             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="secondary" size="icon" className="rounded-full">
-                  <Avatar>
-                    <AvatarFallback>U</AvatarFallback>
-                  </Avatar>
-                  <span className="sr-only">Toggle user menu</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel className="flex flex-col">
-                  <div className="flex items-center gap-2">
-                    <span>Demo User</span> <Badge variant="secondary">DEMO</Badge>
-                  </div>
-                  <span className="text-xs font-normal text-muted-foreground">
-                    demo@patchwise.co
-                  </span>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <UserMenu />
           </div>
         </header>
         {children}
