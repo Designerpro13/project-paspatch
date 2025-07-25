@@ -23,7 +23,7 @@ function StatCard({ title, value, icon: Icon, description, colorClass = "" }: {
   colorClass?: string,
 }) {
   return (
-    <Card>
+    <Card className="transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">
           {title}
@@ -94,7 +94,7 @@ export default function DashboardPage() {
         />
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="lg:col-span-4">
+        <Card className="lg:col-span-4 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
           <CardHeader>
             <CardTitle>Vulnerability Overview</CardTitle>
           </CardHeader>
@@ -102,7 +102,7 @@ export default function DashboardPage() {
             <VulnerabilityChart data={dashboardData.vulnerabilityChartData} />
           </CardContent>
         </Card>
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
           <CardHeader>
             <CardTitle>High-Priority Patches</CardTitle>
           </CardHeader>
