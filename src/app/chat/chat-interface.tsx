@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { CornerDownLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -86,13 +88,15 @@ export function ChatInterface() {
                 </Avatar>
               )}
               <div
-                className={`max-w-prose rounded-lg p-3 text-sm ${
+                className={`prose prose-sm max-w-prose rounded-lg p-3 text-sm ${
                   message.role === "user"
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted"
                 }`}
               >
-                <p>{message.content}</p>
+                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {message.content}
+                </ReactMarkdown>
               </div>
               {message.role === "user" && (
                 <Avatar className="h-8 w-8">
