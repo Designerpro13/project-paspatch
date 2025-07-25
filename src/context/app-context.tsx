@@ -5,6 +5,7 @@
 import { PrioritizePatchesOutput } from "@/ai/flows/prioritize-patches";
 import { ParseNmapServiceScanOutput } from "@/ai/flows/parse-nmap-service-scan";
 import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from "react";
+import {v4 as uuidv4} from 'uuid';
 
 type Vulnerability = {
   id: string;
@@ -13,7 +14,26 @@ type Vulnerability = {
 }
 
 type Asset = ParseNmapServiceScanOutput['services'][0];
-type Patch = PrioritizePatchesOutput[0];
+export type Patch = PrioritizePatchesOutput[0] & {id: string};
+
+const DEMO_VULNERABILITIES: Vulnerability[] = [
+    { id: "CVE-2023-50164", severity: "High" },
+    { id: "CVE-2023-3390", severity: "Critical" },
+    { id: "CVE-2024-1234", severity: "Medium" },
+];
+
+const DEMO_ASSETS: Asset[] = [
+    { port: 22, protocol: 'tcp', serviceName: 'OpenSSH', serviceVersion: '8.2p1', state: 'open' },
+    { port: 80, protocol: 'tcp', serviceName: 'Apache httpd', serviceVersion: '2.4.41', state: 'open' },
+    { port: 443, protocol: 'tcp', serviceName: 'Nginx', serviceVersion: '1.18.0', state: 'open' },
+];
+
+const DEMO_PATCHES: Patch[] = [
+    { id: uuidv4(), priority: 'Critical', service: 'Apache Struts', currentVersion: '2.5.32', recommendedPatch: 'Upgrade to 2.5.33', rationale: 'Addresses RCE vulnerability CVE-2023-50164.'},
+    { id: uuidv4(), priority: 'High', service: 'OpenSSH', currentVersion: '8.2p1', recommendedPatch: 'Upgrade to 9.7p1', rationale: 'Fixes multiple security flaws.'},
+    { id: uuidv4(), priority: 'Medium', service: 'Nginx', currentVersion: '1.18.0', recommendedPatch: 'Upgrade to 1.25.3', rationale: 'Includes several bug fixes and performance improvements.'},
+];
+
 
 const DEMO_DATA = {
   totalVulnerabilities: 1234,
@@ -54,7 +74,10 @@ interface AppContextType {
   toggleDemoMode: () => void;
   addVulnerabilities: (newVulnerabilities: Vulnerability[]) => void;
   addAssets: (newAssets: Asset[]) => void;
-  addPatches: (newPatches: Patch[]) => void;
+  addPatches: (newPatches: Omit<Patch, 'id'>[]) => void;
+  createPatch: (patch: Omit<Patch, 'id'>) => void;
+  updatePatch: (updatedPatch: Patch) => void;
+  deletePatch: (patchId: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -86,6 +109,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  useEffect(() => {
+    if (isDemoMode) {
+      setVulnerabilities(DEMO_VULNERABILITIES);
+      setAssets(DEMO_ASSETS);
+      setPatches(DEMO_PATCHES);
+    } else {
+      setVulnerabilities([]);
+      setAssets([]);
+      setPatches([]);
+    }
+  }, [isDemoMode]);
+
   const login = (user: string, pass: string) => {
     if (user === "admin" && pass === "admin") {
       setIsAuthenticated(true);
@@ -114,8 +149,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setAssets(prev => [...prev, ...newAssets]);
   }
 
-  const addPatches = (newPatches: Patch[]) => {
-    setPatches(prev => [...prev, ...newPatches]);
+  const addPatches = (newPatches: Omit<Patch, 'id'>[]) => {
+    const patchesWithIds: Patch[] = newPatches.map(p => ({...p, id: uuidv4()}));
+    setPatches(prev => [...prev, ...patchesWithIds]);
+  }
+  
+  const createPatch = (patch: Omit<Patch, 'id'>) => {
+    const newPatch: Patch = {...patch, id: uuidv4()};
+    setPatches(prev => [newPatch, ...prev]);
+  }
+
+  const updatePatch = (updatedPatch: Patch) => {
+    setPatches(prev => prev.map(p => p.id === updatedPatch.id ? updatedPatch : p));
+  }
+
+  const deletePatch = (patchId: string) => {
+    setPatches(prev => prev.filter(p => p.id !== patchId));
   }
 
   const actualData = useMemo(() => {
@@ -129,7 +178,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return {
       totalVulnerabilities: vulnerabilities.length,
       criticalIssues: severities.Critical,
-      patchesApplied: patches.length,
+      patchesApplied: patches.filter(p => p.priority !== 'Critical' && p.priority !== 'High').length,
       assetsMonitored: assets.length,
       vulnerabilityChartData: [
         { severity: "Low", count: severities.Low },
@@ -157,6 +206,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         addVulnerabilities,
         addAssets,
         addPatches,
+        createPatch,
+        updatePatch,
+        deletePatch
     }}>
       {children}
     </AppContext.Provider>

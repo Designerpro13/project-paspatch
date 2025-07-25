@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -58,7 +59,7 @@ export default function PrioritizePage() {
       addPatches(response);
       toast({
         title: "Success",
-        description: "Patch prioritization complete. Dashboard updated.",
+        description: "Patch prioritization complete. Dashboard and Patch Management page updated.",
       });
     } catch (error: any) {
       console.error("Prioritization error:", error);

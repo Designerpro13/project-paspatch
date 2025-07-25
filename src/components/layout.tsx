@@ -30,6 +30,7 @@ import {
   Moon,
   Sun,
   Laptop,
+  Wrench,
 } from "lucide-react";
 import * as React from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -58,10 +59,11 @@ const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/chat", label: "Vulnerability Chat", icon: MessageSquare },
   { href: "/ingest", label: "Ingest Data", icon: Upload },
-  { href: "/mapping", label: "Asset Mapping", icon: Network },
-  { href: "/advisor", label: "Patch Advisor", icon: ShieldCheck },
   { href: "/scan-parser", label: "Scan Parser", icon: ScanLine },
+  { href: "/mapping", label: "Asset Mapping", icon: Network },
   { href: "/prioritize", label: "Prioritize Patches", icon: ListTodo },
+  { href: "/patches", label: "Patch Management", icon: Wrench },
+  { href: "/advisor", label: "Patch Advisor", icon: ShieldCheck },
   { href: "/reports", label: "Security Reports", icon: FileText },
 ];
 
