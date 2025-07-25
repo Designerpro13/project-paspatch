@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -11,6 +12,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
+  SidebarRail,
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
@@ -22,12 +24,25 @@ import {
   ListTodo,
   FileText,
   PanelLeft,
+  User,
+  LogOut,
+  Settings,
 } from "lucide-react";
 import * as React from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Logo } from "./icons";
 import { Button } from "./ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "./ui/badge";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -40,37 +55,72 @@ const navItems = [
   { href: "/reports", label: "Security Reports", icon: FileText },
 ];
 
+function DateTime() {
+    const [time, setTime] = React.useState('');
+    const [date, setDate] = React.useState('');
+
+    React.useEffect(() => {
+        const updateDateTime = () => {
+            const now = new Date();
+            setTime(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+            setDate(now.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
+        };
+
+        updateDateTime();
+        const intervalId = setInterval(updateDateTime, 1000 * 60); 
+
+        return () => clearInterval(intervalId);
+    }, []);
+
+    return (
+        <div className="text-sm text-muted-foreground hidden md:block">
+            <div>{time}</div>
+            <div>{date}</div>
+        </div>
+    )
+}
+
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
     <SidebarProvider>
-      <Sidebar>
+      <Sidebar collapsible="icon">
+        <SidebarRail />
         <SidebarHeader className="p-4">
           <div className="flex items-center gap-2">
             <Logo className="size-8" />
-            <span className="text-lg font-semibold">PatchWise</span>
+            <span className="text-lg font-semibold group-data-[collapsible=icon]:hidden">PatchWise</span>
           </div>
         </SidebarHeader>
         <SidebarContent className="p-4">
           <SidebarMenu>
             {navItems.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname === item.href}
-                  tooltip={item.label}
-                >
-                  <Link href={item.href}>
-                    <item.icon />
-                    <span>{item.label}</span>
+                 <Link href={item.href}>
+                    <SidebarMenuButton
+                      isActive={pathname === item.href}
+                      tooltip={item.label}
+                    >
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </SidebarMenuButton>
                   </Link>
-                </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
         </SidebarContent>
-        <SidebarFooter className="p-4"></SidebarFooter>
+        <SidebarFooter className="p-4">
+            <div className="flex items-center gap-2">
+                 <Avatar className="size-8">
+                    <AvatarFallback>N</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col group-data-[collapsible=icon]:hidden">
+                    <span className="text-sm font-semibold">Demo User</span>
+                    <span className="text-xs text-muted-foreground">demo@patchwise.co</span>
+                </div>
+            </div>
+        </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <header className="flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6">
@@ -86,9 +136,45 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </SidebarTrigger>
           <div className="w-full flex-1">
             <h1 className="font-semibold text-lg">
-              {navItems.find((item) => item.href === pathname)?.label ||
-                "Dashboard"}
+              {navItems.find((item) => item.href === pathname)?.label || "Dashboard"}
             </h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <DateTime />
+             <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="secondary" size="icon" className="rounded-full">
+                  <Avatar>
+                    <AvatarFallback>U</AvatarFallback>
+                  </Avatar>
+                  <span className="sr-only">Toggle user menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <span>Demo User</span> <Badge variant="secondary">DEMO</Badge>
+                  </div>
+                  <span className="text-xs font-normal text-muted-foreground">
+                    demo@patchwise.co
+                  </span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
         {children}
