@@ -1,18 +1,18 @@
-# RisQWise
+# PatchQWise
 
-RisQWise is an AI-powered vulnerability management platform designed to streamline security operations. It intelligently ingests and normalizes vulnerability data, parses network scans, and maps threats to assets using generative AI.
+PatchWise is an AI-powered vulnerability management platform designed to streamline security operations. It intelligently ingests and normalizes vulnerability data, parses network scans, and maps threats to assets using generative AI.
 
-Key features include an AI-driven patch advisor that prioritizes remediation, an interactive vulnerability chat for natural language queries, and customizable security reports. By providing an actionable, risk-based approach, RisQWise helps security teams work more efficiently, focusing on what matters most to enhance overall security posture through intelligent automation.
+Key features include an AI-driven patch advisor that prioritizes remediation, an interactive vulnerability chat for natural language queries, and customizable security reports. By providing an actionable, risk-based approach, PatchWise helps security teams work more efficiently, focusing on what matters most to enhance overall security posture through intelligent automation.
 
 ## Getting Started
 
-To get started with RisQWise, follow these steps:
+To get started with PatchWise, follow these steps:
 
 1.  **Clone the repository:**
 
     ```bash
-    git clone <repository_url>
-    cd RisQWise
+    git clone https://github.com/Designerpro13/project-paspatch/
+    cd PatchWise
     ```
 
 2.  **Install dependencies:**
