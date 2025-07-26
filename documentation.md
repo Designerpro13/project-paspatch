@@ -1,6 +1,6 @@
-# RisQWise Documentation
+# PatchWise Documentation
 
-This document provides comprehensive information about the RisQWise platform, including its features, installation, configuration, and usage.
+This document provides comprehensive information about the PatchWise platform, including its features, installation, configuration, and usage.
 
 ## Table of Contents
 
@@ -19,11 +19,11 @@ This document provides comprehensive information about the RisQWise platform, in
 
 ## 1. Introduction
 
-RisQWise is an AI-powered vulnerability management platform designed to assist security teams in efficiently identifying, analyzing, prioritizing, and remediating security vulnerabilities. By leveraging generative AI, RisQWise streamlines various stages of the vulnerability management lifecycle, enabling a proactive and risk-based approach to cybersecurity.
+PatchWise is an AI-powered vulnerability management platform designed to assist security teams in efficiently identifying, analyzing, prioritizing, and remediating security vulnerabilities. By leveraging generative AI, PatchWise streamlines various stages of the vulnerability management lifecycle, enabling a proactive and risk-based approach to cybersecurity.
 
 ## 2. Features
 
-RisQWise offers a range of features to enhance vulnerability management:
+PatchWise offers a range of features to enhance vulnerability management:
 
 *   **Vulnerability Data Ingestion and Normalization:** Ingests vulnerability data from various sources and uses AI to normalize and standardize the data.
 *   **Vulnerability Asset Mapping:** Maps identified vulnerabilities to organizational assets using AI correlation.
@@ -39,7 +39,7 @@ RisQWise offers a range of features to enhance vulnerability management:
 
 ### Prerequisites
 
-Before installing RisQWise, ensure you have the following installed:
+Before installing PatchWise, ensure you have the following installed:
 
 *   Node.js (and npm or yarn)
 *   Git
@@ -49,8 +49,8 @@ Before installing RisQWise, ensure you have the following installed:
 1.  Clone the repository:
 
     ```bash
-    git clone <repository_url>
-    cd RisQWise
+    git clone [<repository_url>](https://github.com/Designerpro13/project-paspatch/
+    cd PatchWise
     ```
 
 2.  Install dependencies:
@@ -63,20 +63,18 @@ Before installing RisQWise, ensure you have the following installed:
 
 ### API Key Configuration
 
-RisQWise utilizes external APIs for certain functionalities, particularly those powered by generative AI. To use the platform, you will need to configure your API keys.
+PatchWise utilizes external APIs for certain functionalities, particularly those powered by generative AI. To use the platform, you will need to configure your API keys.
 
 1.  Create a `.env.local` file in the root of the project directory. This file will store your environment variables, including API keys.
 
 2.  Add your API keys to the `.env.local` file in the following format:
 
     ```dotenv
-    YOUR_API_KEY_NAME=your_api_key_value
-    # e.g.,
-    # GOOGLE_API_KEY=your_google_api_key_here
+      GOOGLE_API_KEY=your_google_api_key_here
     # OPENAI_API_KEY=your_openai_api_key_here
     ```
 
-    *Replace `YOUR_API_KEY_NAME` with the actual name of the environment variable expected by the application (check the codebase or consult specific module documentation if available).* Replace `your_api_key_value` with your actual API key.
+    * Replace `your_api_key_value` with your actual API key.
 
 3.  Ensure that the `.env*.local` entry is present in your `.gitignore` file to prevent your API keys from being committed to your repository.
 
@@ -84,7 +82,7 @@ RisQWise utilizes external APIs for certain functionalities, particularly those 
 
 ### Running Locally
 
-To run the RisQWise platform locally, use the following command:
+To run the PatchWise platform locally, use the following command:
 
 ```bash
 npm run dev
@@ -94,13 +92,9 @@ yarn dev
 
 This will start the development server, and you can access the application in your web browser, typically at `http://localhost:3000`.
 
-### Key Modules
-
-*(Further documentation on specific modules and their usage will be provided here as the project develops.)*
-
 ## 5. Limitations
 
-RisQWise, particularly in its current stage of development and reliance on AI, has certain limitations:
+PatchWise, particularly in its current stage of development and reliance on AI, has certain limitations:
 
 *   **AI Accuracy:** The accuracy of vulnerability analysis, mapping, and patch recommendations is dependent on the quality and capabilities of the underlying AI models. While efforts are made to ensure accuracy, AI can sometimes produce incorrect or irrelevant information.
 *   **Data Source Dependency:** The effectiveness of the platform is contingent on the availability and quality of vulnerability data from ingested sources.
@@ -108,11 +102,3 @@ RisQWise, particularly in its current stage of development and reliance on AI, h
 *   **Continuous Development:** The platform is under continuous development, and some features may be incomplete or subject to change.
 
 Users should exercise discretion and verify critical information provided by the AI.
-
-## 6. Contributing
-
-*(Details on how to contribute to the project will be added here.)*
-
-## 7. License
-
-*(License information will be added here.)*
