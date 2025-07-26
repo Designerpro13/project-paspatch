@@ -221,11 +221,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
            <SidebarMenu>
             {navGroups.map((group) => (
                 <Collapsible key={group.title} defaultOpen={group.items.some(item => pathname.startsWith(item.href) && (item.href !== '/' || pathname === '/'))}>
-                    <CollapsibleTrigger className="w-full">
-                        <SidebarMenuButton className="w-full justify-start" variant="ghost" size="sm" tooltip={group.title}>
-                            <group.icon className="size-4" />
-                            <span className="w-full text-left">{group.title}</span>
-                        </SidebarMenuButton>
+                    <CollapsibleTrigger asChild className="w-full">
+                        <div>
+                            <SidebarMenuButton className="w-full justify-start" variant="ghost" size="sm" tooltip={group.title}>
+                                <group.icon className="size-4" />
+                                <span className="w-full text-left">{group.title}</span>
+                            </SidebarMenuButton>
+                        </div>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                          <SidebarMenuSub className="gap-0.5">
