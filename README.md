@@ -50,10 +50,4 @@ To get started with PatchWise, follow these steps:
 
 For more detailed information on installation, configuration, usage, and limitations, please refer to the [documentation.md](documentation.md) file.
 
-## Contributing
 
-*(Details on how to contribute will be added.)*
-
-## License
-
-*(License information will be added.)*
