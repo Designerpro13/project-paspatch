@@ -221,7 +221,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
            <SidebarMenu>
             {navGroups.map((group) => (
                 <Collapsible key={group.title} defaultOpen={group.items.some(item => pathname.startsWith(item.href) && (item.href !== '/' || pathname === '/'))}>
-                    <CollapsibleTrigger asChild className="w-full">
+                    <CollapsibleTrigger asChild>
                         <div>
                             <SidebarMenuButton className="w-full justify-start" variant="ghost" size="sm" tooltip={group.title}>
                                 <group.icon className="size-4" />
@@ -233,7 +233,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                          <SidebarMenuSub className="gap-0.5">
                             {group.items.map((item) => (
                                 <SidebarMenuSubItem key={item.href}>
-                                     <Link href={item.href}>
+                                     <Link href={item.href} legacyBehavior passHref>
                                         <SidebarMenuSubButton
                                             isActive={pathname === item.href}
                                         >
