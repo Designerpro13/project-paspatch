@@ -1,4 +1,4 @@
-# **App Name**: PatchWise
+# **App Name**: RisQWise
 
 ## Core Features:
 
