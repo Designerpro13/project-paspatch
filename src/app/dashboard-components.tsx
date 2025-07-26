@@ -24,7 +24,9 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { useApp } from "@/context/app-context";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ListTodo } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const chartConfig = {
   count: {
@@ -67,6 +69,7 @@ export function VulnerabilityChart({ data }: { data: any[] }) {
 
 export function HighPriorityPatchesTable() {
   const { patches } = useApp();
+  const highPriorityPatches = patches.filter(p => p.priority === "Critical" || p.priority === "High");
 
   const getBadgeVariant = (severity: string) => {
     switch (severity) {
@@ -79,12 +82,18 @@ export function HighPriorityPatchesTable() {
     }
   };
 
-  if (patches.length === 0) {
+  if (highPriorityPatches.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-8">
-        <AlertCircle className="size-10 mb-4" />
-        <h3 className="font-semibold">No Patches Prioritized</h3>
-        <p className="text-sm">Run the patch prioritizer to see recommended patches here.</p>
+      <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-8 gap-2">
+        <AlertCircle className="size-10 mb-2" />
+        <h3 className="font-semibold">No High-Priority Patches</h3>
+        <p className="text-sm">Run the patch prioritizer to see recommendations.</p>
+         <Button asChild variant="link" className="text-sm">
+            <Link href="/prioritize">
+                <ListTodo className="size-4 mr-2" />
+                Go to Prioritizer
+            </Link>
+        </Button>
       </div>
     )
   }
@@ -99,7 +108,7 @@ export function HighPriorityPatchesTable() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {patches.filter(p => p.priority === "Critical" || p.priority === "High").map((patch, index) => (
+        {highPriorityPatches.map((patch, index) => (
           <TableRow key={index}>
             <TableCell>
               <Badge variant={getBadgeVariant(patch.priority)}>

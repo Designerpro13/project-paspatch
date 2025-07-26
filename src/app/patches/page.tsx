@@ -53,14 +53,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, PlusCircle, MoreHorizontal } from "lucide-react";
+import { Edit, Trash2, PlusCircle, MoreHorizontal, ListTodo } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-  } from "@/components/ui/dropdown-menu"
+  } from "@/components/ui/dropdown-menu";
+import Link from "next/link";
 
 const patchSchema = z.object({
   id: z.string().optional(),
@@ -202,69 +203,80 @@ export default function PatchesPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Priority</TableHead>
-                <TableHead>Service</TableHead>
-                <TableHead>Current Version</TableHead>
-                <TableHead>Recommendation</TableHead>
-                <TableHead>Rationale</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {patches.map((patch) => (
-                <TableRow key={patch.id}>
-                  <TableCell>
-                    <Badge variant={getBadgeVariant(patch.priority)}>
-                      {patch.priority}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{patch.service}</TableCell>
-                  <TableCell>{patch.currentVersion}</TableCell>
-                  <TableCell>{patch.recommendedPatch}</TableCell>
-                  <TableCell className="max-w-xs truncate">{patch.rationale}</TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEdit(patch)}>
-                                <Edit className="mr-2 h-4 w-4" />
-                                <span>Edit</span>
-                            </DropdownMenuItem>
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                        <Trash2 className="mr-2 h-4 w-4 text-destructive" />
-                                        <span className="text-destructive">Delete</span>
-                                    </DropdownMenuItem>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        This action cannot be undone. This will permanently delete this patch record.
-                                    </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleDelete(patch.id)}>Continue</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+          {patches.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Priority</TableHead>
+                  <TableHead>Service</TableHead>
+                  <TableHead>Current Version</TableHead>
+                  <TableHead>Recommendation</TableHead>
+                  <TableHead>Rationale</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {patches.map((patch) => (
+                  <TableRow key={patch.id}>
+                    <TableCell>
+                      <Badge variant={getBadgeVariant(patch.priority)}>
+                        {patch.priority}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{patch.service}</TableCell>
+                    <TableCell>{patch.currentVersion}</TableCell>
+                    <TableCell>{patch.recommendedPatch}</TableCell>
+                    <TableCell className="max-w-xs truncate">{patch.rationale}</TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                  <span className="sr-only">Open menu</span>
+                                  <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleEdit(patch)}>
+                                  <Edit className="mr-2 h-4 w-4" />
+                                  <span>Edit</span>
+                              </DropdownMenuItem>
+                              <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                      <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                          <Trash2 className="mr-2 h-4 w-4 text-destructive" />
+                                          <span className="text-destructive">Delete</span>
+                                      </DropdownMenuItem>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                          This action cannot be undone. This will permanently delete this patch record.
+                                      </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => handleDelete(patch.id)}>Continue</AlertDialogAction>
+                                      </AlertDialogFooter>
+                                  </AlertDialogContent>
+                              </AlertDialog>
+                          </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+             <div className="flex flex-col items-center justify-center h-48 text-center text-muted-foreground gap-2">
+                <ListTodo className="size-10 mb-2" />
+                <h3 className="font-semibold">No Patch Records Found</h3>
+                <p className="text-sm">Use the prioritizer to generate patch recommendations automatically.</p>
+                <Button asChild variant="link" className="text-sm">
+                    <Link href="/prioritize">Go to Prioritize Patches</Link>
+                </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
       

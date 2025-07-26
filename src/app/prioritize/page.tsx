@@ -11,16 +11,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { prioritizePatches, PrioritizePatchesOutput } from "@/ai/flows/prioritize-patches";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, ScanLine } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApp } from "@/context/app-context";
+import Link from "next/link";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function PrioritizePage() {
   const [nmapScanResult, setNmapScanResult] = useState("");
   const [result, setResult] = useState<PrioritizePatchesOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { assets, addPatches } = useApp();
+  const { assets, addPatches, isDemoMode } = useApp();
   
   useEffect(() => {
     if (assets.length > 0) {
@@ -35,6 +37,8 @@ export default function PrioritizePage() {
         </host>
       </nmaprun>`;
       setNmapScanResult(xml);
+    } else {
+        setNmapScanResult("");
     }
   }, [assets]);
 
@@ -98,6 +102,17 @@ export default function PrioritizePage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+               {assets.length === 0 && !isDemoMode && (
+                 <Alert>
+                    <ScanLine className="h-4 w-4" />
+                    <AlertTitle>No Asset Data Found</AlertTitle>
+                    <AlertDescription>
+                        The asset inventory is empty. Please use the {" "}
+                        <Link href="/scan-parser" className="font-semibold underline">Scan Parser</Link>
+                        {" "} to add assets before prioritizing patches. You can also paste XML data manually below.
+                    </AlertDescription>
+                </Alert>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="nmapScanResult">Nmap Scan Result (XML from parsed assets)</Label>
                 <Textarea
@@ -106,7 +121,7 @@ export default function PrioritizePage() {
                   onChange={(e) => setNmapScanResult(e.target.value)}
                   placeholder="<nmaprun>...</nmaprun>"
                   className="min-h-[250px] font-mono"
-                  readOnly={assets.length > 0}
+                  readOnly={assets.length > 0 && !isDemoMode}
                 />
               </div>
             </CardContent>

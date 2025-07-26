@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useApp, Vulnerability, VulnerabilityStatus } from "@/context/app-context";
@@ -24,8 +25,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, Bug } from "lucide-react";
+import { MoreHorizontal, Bug, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function VulnerabilitiesPage() {
   const { vulnerabilities, updateVulnerabilityStatus } = useApp();
@@ -74,6 +76,7 @@ export default function VulnerabilitiesPage() {
             </div>
         </CardHeader>
         <CardContent>
+        {vulnerabilities.length > 0 ? (
           <Table>
             <TableHeader>
               <TableRow>
@@ -118,6 +121,19 @@ export default function VulnerabilitiesPage() {
               ))}
             </TableBody>
           </Table>
+        ) : (
+             <div className="flex flex-col items-center justify-center h-48 text-center text-muted-foreground gap-2">
+                <Bug className="size-10 mb-2" />
+                <h3 className="font-semibold">No Data Here</h3>
+                <p className="text-sm">Use the Ingest Data page to see available vulnerabilities.</p>
+                <Button asChild variant="link" className="text-sm">
+                    <Link href="/ingest">
+                        <Upload className="size-4 mr-2" />
+                        Go to Ingest Data
+                    </Link>
+                </Button>
+            </div>
+        )}
         </CardContent>
       </Card>
     </div>
