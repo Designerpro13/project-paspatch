@@ -7,9 +7,11 @@ import { ParseNmapServiceScanOutput } from "@/ai/flows/parse-nmap-service-scan";
 import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from "react";
 import {v4 as uuidv4} from 'uuid';
 
-type Vulnerability = {
+export type VulnerabilityStatus = "New" | "Investigating" | "Patched" | "False Positive";
+export type Vulnerability = {
   id: string;
   severity: "Critical" | "High" | "Medium" | "Low";
+  status: VulnerabilityStatus;
   [key: string]: any;
 }
 
@@ -17,9 +19,12 @@ type Asset = ParseNmapServiceScanOutput['services'][0];
 export type Patch = PrioritizePatchesOutput[0] & {id: string};
 
 const DEMO_VULNERABILITIES: Vulnerability[] = [
-    { id: "CVE-2023-50164", severity: "High" },
-    { id: "CVE-2023-3390", severity: "Critical" },
-    { id: "CVE-2024-1234", severity: "Medium" },
+    { id: "CVE-2023-50164", severity: "High", status: "New" },
+    { id: "CVE-2023-3390", severity: "Critical", status: "Investigating" },
+    { id: "CVE-2024-1234", severity: "Medium", status: "Patched" },
+    { id: "CVE-2021-44228", severity: "Critical", status: "New" },
+    { id: "CVE-2022-1388", severity: "High", status: "False Positive" },
+
 ];
 
 const DEMO_ASSETS: Asset[] = [
@@ -72,7 +77,8 @@ interface AppContextType {
   login: (user: string, pass: string) => boolean;
   logout: () => void;
   toggleDemoMode: () => void;
-  addVulnerabilities: (newVulnerabilities: Vulnerability[]) => void;
+  addVulnerabilities: (newVulnerabilities: Omit<Vulnerability, 'status' | 'id'>[]) => void;
+  updateVulnerabilityStatus: (id: string, status: VulnerabilityStatus) => void;
   addAssets: (newAssets: Asset[]) => void;
   addPatches: (newPatches: Omit<Patch, 'id'>[]) => void;
   createPatch: (patch: Omit<Patch, 'id'>) => void;
@@ -141,8 +147,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("patchwise_demo_mode", JSON.stringify(newMode));
   };
   
-  const addVulnerabilities = (newVulnerabilities: Vulnerability[]) => {
-    setVulnerabilities(prev => [...prev, ...newVulnerabilities]);
+  const addVulnerabilities = (newVulnerabilities: Omit<Vulnerability, 'status' | 'id'>[]) => {
+    const vulnerabilitiesWithStatus = newVulnerabilities.map(v => ({...v, id: v.id || uuidv4(), status: 'New' as VulnerabilityStatus}))
+    setVulnerabilities(prev => [...prev, ...vulnerabilitiesWithStatus]);
+  }
+
+  const updateVulnerabilityStatus = (id: string, status: VulnerabilityStatus) => {
+    setVulnerabilities(prev => prev.map(v => v.id === id ? {...v, status} : v));
   }
   
   const addAssets = (newAssets: Asset[]) => {
@@ -168,7 +179,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }
 
   const actualData = useMemo(() => {
-    const severities = { Low: 0, Medium: 0, High: 0, Critical: 0 };
+    const severities: Record<"Critical" | "High" | "Medium" | "Low", number> = { Low: 0, Medium: 0, High: 0, Critical: 0 };
     vulnerabilities.forEach(vuln => {
       if (severities[vuln.severity] !== undefined) {
         severities[vuln.severity]++;
@@ -178,7 +189,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return {
       totalVulnerabilities: vulnerabilities.length,
       criticalIssues: severities.Critical,
-      patchesApplied: patches.filter(p => p.priority !== 'Critical' && p.priority !== 'High').length,
+      patchesApplied: patches.length,
       assetsMonitored: assets.length,
       vulnerabilityChartData: [
         { severity: "Low", count: severities.Low },
@@ -204,6 +215,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         logout,
         toggleDemoMode,
         addVulnerabilities,
+        updateVulnerabilityStatus,
         addAssets,
         addPatches,
         createPatch,

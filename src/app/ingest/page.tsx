@@ -40,7 +40,10 @@ export default function IngestPage() {
       if (response.success) {
         setResult(response);
         const parsedData = JSON.parse(response.normalizedData);
-        addVulnerabilities(Array.isArray(parsedData) ? parsedData : [parsedData]);
+
+        // Assuming parsedData is an array of vulnerabilities, or an object with a vulnerabilities key
+        const vulnerabilities = parsedData.vulnerabilities || (Array.isArray(parsedData) ? parsedData : [parsedData]);
+        addVulnerabilities(vulnerabilities);
 
         toast({
           title: "Success",
@@ -89,7 +92,7 @@ export default function IngestPage() {
                   id="data"
                   value={data}
                   onChange={(e) => setData(e.target.value)}
-                  placeholder='{ "cve": { "id": "CVE-2023-1234", ... } }'
+                  placeholder='{ "vulnerabilities": [{ "id": "CVE-2023-1234", ... }] }'
                   className="min-h-[200px] font-mono"
                 />
               </div>

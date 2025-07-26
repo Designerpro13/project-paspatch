@@ -13,6 +13,11 @@ import {
   SidebarMenuButton,
   SidebarFooter,
   SidebarRail,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
@@ -27,10 +32,11 @@ import {
   User,
   LogOut,
   Settings,
-  Moon,
-  Sun,
-  Laptop,
   Wrench,
+  Bug,
+  FolderCog,
+  FilePieChart,
+  BrainCircuit,
 } from "lucide-react";
 import * as React from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -44,28 +50,51 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuPortal,
-  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "./ui/badge";
 import { useApp } from "@/context/app-context";
 import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 
-const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/chat", label: "Vulnerability Chat", icon: MessageSquare },
-  { href: "/ingest", label: "Ingest Data", icon: Upload },
-  { href: "/scan-parser", label: "Scan Parser", icon: ScanLine },
-  { href: "/mapping", label: "Asset Mapping", icon: Network },
-  { href: "/prioritize", label: "Prioritize Patches", icon: ListTodo },
-  { href: "/patches", label: "Patch Management", icon: Wrench },
-  { href: "/advisor", label: "Patch Advisor", icon: ShieldCheck },
-  { href: "/reports", label: "Security Reports", icon: FileText },
-];
+const navGroups = [
+    {
+        title: 'Analysis',
+        icon: BrainCircuit,
+        items: [
+            { href: "/", label: "Dashboard", icon: LayoutDashboard },
+            { href: "/chat", label: "Vulnerability Chat", icon: MessageSquare },
+        ]
+    },
+    {
+        title: 'Data Management',
+        icon: FolderCog,
+        items: [
+            { href: "/ingest", label: "Ingest Data", icon: Upload },
+            { href: "/scan-parser", label: "Scan Parser", icon: ScanLine },
+            { href: "/mapping", label: "Asset Mapping", icon: Network },
+        ]
+    },
+    {
+        title: 'Patch Management',
+        icon: Wrench,
+        items: [
+            { href: "/vulnerabilities", label: "Vulnerabilities", icon: Bug },
+            { href: "/prioritize", label: "Prioritize Patches", icon: ListTodo },
+            { href: "/patches", label: "Patch Records", icon: Wrench },
+            { href: "/advisor", label: "Patch Advisor", icon: ShieldCheck },
+        ]
+    },
+    {
+        title: 'Reporting',
+        icon: FilePieChart,
+        items: [
+            { href: "/reports", label: "Security Reports", icon: FileText },
+        ]
+    }
+]
+
 
 function DateTime() {
     const [time, setTime] = React.useState('');
@@ -188,20 +217,33 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <span className="text-lg font-semibold group-data-[collapsible=icon]:hidden">PatchWise</span>
           </div>
         </SidebarHeader>
-        <SidebarContent className="p-4">
-          <SidebarMenu>
-            {navItems.map((item) => (
-              <SidebarMenuItem key={item.href}>
-                 <Link href={item.href}>
-                    <SidebarMenuButton
-                      isActive={pathname === item.href}
-                      tooltip={item.label}
-                    >
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </SidebarMenuButton>
-                  </Link>
-              </SidebarMenuItem>
+        <SidebarContent className="p-2">
+           <SidebarMenu>
+            {navGroups.map((group) => (
+                <Collapsible key={group.title} defaultOpen={group.items.some(item => pathname.startsWith(item.href) && (item.href !== '/' || pathname === '/'))}>
+                    <CollapsibleTrigger className="w-full">
+                        <SidebarMenuButton className="w-full justify-start" variant="ghost" size="sm" tooltip={group.title}>
+                            <group.icon className="size-4" />
+                            <span className="w-full text-left">{group.title}</span>
+                        </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                         <SidebarMenuSub className="gap-0.5">
+                            {group.items.map((item) => (
+                                <SidebarMenuSubItem key={item.href}>
+                                     <Link href={item.href}>
+                                        <SidebarMenuSubButton
+                                            isActive={pathname === item.href}
+                                        >
+                                            <item.icon />
+                                            <span>{item.label}</span>
+                                        </SidebarMenuSubButton>
+                                    </Link>
+                                </SidebarMenuSubItem>
+                            ))}
+                        </SidebarMenuSub>
+                    </CollapsibleContent>
+                </Collapsible>
             ))}
           </SidebarMenu>
         </SidebarContent>
@@ -231,7 +273,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </SidebarTrigger>
           <div className="w-full flex-1">
             <h1 className="font-semibold text-lg">
-              {navItems.find((item) => item.href === pathname)?.label || "Dashboard"}
+              {navGroups.flatMap(g => g.items).find((item) => item.href === pathname)?.label || "Dashboard"}
             </h1>
           </div>
           <div className="flex items-center gap-4">

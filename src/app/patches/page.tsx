@@ -1,8 +1,9 @@
 
+
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useApp, Patch } from "@/context/app-context";
@@ -29,7 +30,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
     AlertDialog,
@@ -190,7 +190,7 @@ export default function PatchesPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-                <CardTitle>Patch Management</CardTitle>
+                <CardTitle>Patch Records</CardTitle>
                 <CardDescription>
                     Create, edit, and delete patch records for your organization.
                 </CardDescription>
@@ -240,10 +240,10 @@ export default function PatchesPage() {
                             </DropdownMenuItem>
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" className="w-full justify-start text-sm p-2 font-normal text-destructive hover:bg-destructive hover:text-destructive-foreground">
-                                        <Trash2 className="mr-2 h-4 w-4" />
-                                        <span>Delete</span>
-                                    </Button>
+                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                        <Trash2 className="mr-2 h-4 w-4 text-destructive" />
+                                        <span className="text-destructive">Delete</span>
+                                    </DropdownMenuItem>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>
