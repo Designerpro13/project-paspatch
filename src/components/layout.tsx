@@ -233,14 +233,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                          <SidebarMenuSub className="gap-0.5">
                             {group.items.map((item) => (
                                 <SidebarMenuSubItem key={item.href}>
-                                     <Link href={item.href} legacyBehavior passHref>
-                                        <SidebarMenuSubButton
-                                            isActive={pathname === item.href}
-                                        >
+                                     <SidebarMenuSubButton
+                                        asChild
+                                        isActive={pathname === item.href}
+                                    >
+                                        <Link href={item.href}>
                                             <item.icon />
                                             <span>{item.label}</span>
-                                        </SidebarMenuSubButton>
-                                    </Link>
+                                        </Link>
+                                    </SidebarMenuSubButton>
                                 </SidebarMenuSubItem>
                             ))}
                         </SidebarMenuSub>
