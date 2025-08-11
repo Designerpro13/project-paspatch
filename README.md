@@ -1,4 +1,4 @@
-# PatchQWise
+# PatchWise
 
 PatchWise is an AI-powered vulnerability management platform designed to streamline security operations. It intelligently ingests and normalizes vulnerability data, parses network scans, and maps threats to assets using generative AI.
 
