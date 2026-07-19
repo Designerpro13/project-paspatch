@@ -45,6 +45,7 @@ The dependency modernization to Next.js 16, React 19, Tailwind CSS 4, Firebase 1
 - **Processing:** Idempotent ingestion jobs with explicit queued, running, completed, and failed states.
 - **Intelligence:** Deterministic enrichment and scoring followed by Genkit flows for summarized, cited recommendations.
 - **Operations:** Structured logs, error tracking, traces, health checks, usage/cost metrics, and audit events.
+
 ## Delivery phases
 
 ### Phase 0 — Establish a trusted baseline
@@ -146,3 +147,81 @@ Exit criteria:
 - Recommendations without supporting evidence are rejected or clearly marked unverified.
 - Cross-tenant retrieval tests and prompt-injection tests pass.
 - A model or prompt update cannot ship unless it meets agreed evaluation thresholds.
+
+### Phase 5 — Product feature upgrade
+
+**Goal:** Deliver the workflows security teams use daily.
+
+Priority order:
+
+1. **Remediation queue:** saved filters, bulk assignment, SLA views, comments, approvals, and evidence.
+2. **Asset inventory:** ownership, business criticality, environment, exposure, tags, software, and scan history.
+3. **Finding explorer:** CVE/asset/service views, deduplication, exceptions, and full evidence timeline.
+4. **Dashboards:** age, SLA breach, KEV exposure, risk trend, reopen rate, remediation throughput, and coverage.
+5. **Reports:** configurable date ranges, organization branding, PDF/CSV export, scheduled delivery, and immutable snapshots.
+6. **Integrations:** Jira/GitHub Issues, Slack/email notifications, scanner webhooks, and ticket synchronization.
+7. **Search and chat:** scoped natural-language queries that link every answer to records and authoritative advisories.
+
+Exit criteria:
+
+- An analyst can move from imported scan to assigned and verified remediation without copying data between screens.
+- Every dashboard metric has a documented query definition and can be reproduced from stored records.
+- Integrations are idempotent, observable, and safe to retry.
+
+### Phase 6 — Production hardening and launch
+
+**Goal:** Operate PatchWise as a security product, not only deploy it.
+
+Deliverables:
+
+- Structured logging, traces, error tracking, health checks, dashboards, and alerts.
+- Defined SLOs for availability, request latency, ingestion completion, and data freshness.
+- Backup, restore, retention, deletion, and disaster-recovery procedures with a successful restore drill.
+- CSP and security headers, dependency/container scanning, abuse protection, and independent threat modeling.
+- Accessibility review against WCAG 2.2 AA and responsive/browser coverage.
+- Load tests for large scans and concurrent AI jobs, plus cost budgets and quota alerts.
+- Staged environments, preview deployments, release notes, rollback procedure, and incident runbooks.
+
+Exit criteria:
+
+- Security review has no unresolved critical findings.
+- Recovery objectives are documented and demonstrated by a restore test.
+- On-call operators can detect, diagnose, and roll back a failed release using documented procedures.
+
+## Proposed domain model
+
+- `Organization`: tenant, plan, settings, retention policy.
+- `Membership`: user, organization, role, status.
+- `Asset`: hostname/address, environment, owner, criticality, exposure, tags.
+- `SoftwareComponent`: normalized product/package identity and observed version.
+- `Vulnerability`: canonical CVE/advisory data and source provenance.
+- `Finding`: vulnerability-to-asset occurrence, evidence, risk, status, SLA, assignee.
+- `Remediation`: proposed action, approval, schedule, execution, verification, rollback.
+- `IngestionJob`: source artifact, parser version, progress, errors, idempotency key.
+- `AiRun`: prompt/model version, authorized context references, result, citations, cost, review state.
+- `AuditEvent`: immutable actor/action/target record with correlation ID.
+
+## Recommended first two-week sprint
+
+1. Decide and record ADRs for Firebase tenancy, session handling, and repository boundaries.
+2. Add supported Node pinning, ESLint, test runners, and a CI quality gate.
+3. Add typed environment validation and correct API-key documentation.
+4. Define domain schemas independent of Genkit outputs.
+5. Implement Firebase Auth, organization membership, route protection, and emulator-backed security-rule tests.
+6. Persist one vertical slice: create/import asset, list assets, and audit the mutation.
+7. Keep demo mode as seeded data through the same repository interface.
+
+Sprint success means a new user can authenticate, access exactly one organization, create an asset, reload the page, and still see it—while CI proves another organization cannot read it.
+
+## Decisions to make before Phase 1
+
+- Firebase-only backend versus a relational database for reporting-heavy workloads.
+- Single-region versus multi-region storage and the required data residency.
+- Supported identity providers and whether enterprise SSO is a launch requirement.
+- Exact authoritative vulnerability sources and their licensing/redistribution terms.
+- Model-provider data retention requirements for customer security data.
+- Initial tenant scale targets: assets, findings, artifact size, users, and ingestion frequency.
+
+## Definition of done for future work
+
+A feature is complete only when it has authorization checks, schema validation, loading/empty/error states, audit behavior where relevant, automated coverage, observability, accessible interaction, documentation, and a rollback or recovery path.
