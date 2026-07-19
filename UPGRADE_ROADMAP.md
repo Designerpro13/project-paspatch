@@ -45,3 +45,104 @@ The dependency modernization to Next.js 16, React 19, Tailwind CSS 4, Firebase 1
 - **Processing:** Idempotent ingestion jobs with explicit queued, running, completed, and failed states.
 - **Intelligence:** Deterministic enrichment and scoring followed by Genkit flows for summarized, cited recommendations.
 - **Operations:** Structured logs, error tracking, traces, health checks, usage/cost metrics, and audit events.
+## Delivery phases
+
+### Phase 0 — Establish a trusted baseline
+
+**Goal:** Make every later change safe to ship.
+
+Deliverables:
+
+- Pin a supported Node.js LTS release in `engines`, `.nvmrc`, and CI.
+- Add ESLint flat configuration, formatting, and scripts that work with Next.js 16.
+- Add unit, component, and end-to-end test runners; initially cover authentication boundaries and the critical ingest-to-patch path.
+- Add CI checks for install, lint, typecheck, test, production build, dependency audit, and secret scanning.
+- Validate environment variables at startup and align the docs with `GEMINI_API_KEY`.
+- Remove unused packages and add automated dependency-update pull requests.
+- Document local setup, architecture decisions, data handling, and release steps.
+
+Exit criteria:
+
+- A clean checkout produces the same build in local development and CI.
+- No build/type errors are ignored, and all required checks block merging.
+- Secrets are absent from source and validated before server startup.
+
+### Phase 1 — Identity, tenancy, and durable data
+
+**Goal:** Replace the browser-only demo architecture with secure application foundations.
+
+Deliverables:
+
+- Implement Firebase Authentication with secure server-verified sessions.
+- Add organizations and memberships with `owner`, `admin`, `analyst`, and `viewer` roles.
+- Protect routes and server actions; never trust client-provided organization or role identifiers.
+- Define domain-owned schemas for users, organizations, assets, vulnerabilities, findings, patches, and audit events.
+- Introduce repository and service layers instead of importing AI output types into application state.
+- Persist records in Firestore with converters, indexes, tenant-scoped queries, transactions, and tested security rules.
+- Move demo data to explicit seed fixtures and place a visible non-production banner around demo mode.
+- Record immutable audit events for login, ingestion, status changes, recommendations, exports, and administrative actions.
+
+Exit criteria:
+
+- Two organizations cannot access each other's records through either UI or direct API calls.
+- Refreshing or signing in on another device preserves authorized data.
+- Every mutating operation has actor, timestamp, organization, target, and before/after context.
+
+### Phase 2 — Reliable ingestion and vulnerability intelligence
+
+**Goal:** Build trustworthy inputs before adding more AI behavior.
+
+Deliverables:
+
+- Parse Nmap XML with a hardened XML parser; reject DTDs/external entities and enforce file/record limits.
+- Normalize software identity using CPE and package URL where available.
+- Add scheduled NVD CVE and CISA KEV synchronization with source timestamps and retryable cursors.
+- Support CSV/JSON asset imports and preserve the original uploaded artifact.
+- Add idempotency keys, deduplication, validation errors, job progress, retries, and dead-letter handling.
+- Store provenance for every field: source, source record ID, observed time, import job, and parser version.
+- Separate assets, vulnerabilities, and findings so one CVE can affect many assets without duplicating canonical data.
+
+Exit criteria:
+
+- Re-importing the same artifact creates no duplicate assets or findings.
+- Malformed and oversized inputs fail safely with actionable messages.
+- A user can trace each finding back to its exact source artifact and parser version.
+
+### Phase 3 — Explainable risk and remediation workflow
+
+**Goal:** Turn findings into defensible work priorities.
+
+Deliverables:
+
+- Calculate a deterministic base risk from CVSS, CISA KEV, EPSS, exploit maturity, exposure, asset criticality, and compensating controls.
+- Show the scoring formula and contributing evidence beside every priority.
+- Add finding lifecycle states, ownership, comments, due dates, SLA policies, exceptions, and evidence attachments.
+- Add remediation projects that group related patches by service, asset group, or maintenance window.
+- Track patch state separately from patch availability: proposed, approved, scheduled, applied, verified, failed, and rolled back.
+- Verify remediation with a follow-up scan rather than treating recommendation creation as patch completion.
+
+Exit criteria:
+
+- The same evidence always produces the same base score.
+- Analysts can override a score only with a reason, and the override is audited.
+- Dashboard patch metrics count verified remediation, not generated recommendations.
+
+### Phase 4 — Guardrailed AI assistance
+
+**Goal:** Make AI useful without making it the source of truth.
+
+Deliverables:
+
+- Ground chat and advisory flows in tenant-authorized stored records and approved external sources.
+- Require structured outputs containing source references, confidence, assumptions, and uncertainty.
+- Add prompt-injection defenses, input size limits, timeouts, rate limits, token budgets, and output sanitization.
+- Redact secrets and sensitive fields before model calls; define retention and provider data-use policies.
+- Require human approval before AI output changes priority, status, ownership, or remediation plans.
+- Build a versioned evaluation set covering parsing, mapping, prioritization, hallucination, citation quality, and adversarial inputs.
+- Capture model name, prompt version, latency, cost, safety result, and evaluation score for each run.
+
+Exit criteria:
+
+- Recommendations without supporting evidence are rejected or clearly marked unverified.
+- Cross-tenant retrieval tests and prompt-injection tests pass.
+- A model or prompt update cannot ship unless it meets agreed evaluation thresholds.
