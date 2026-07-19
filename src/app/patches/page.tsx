@@ -167,7 +167,8 @@ export default function PatchesPage() {
 
   const handleSave = (data: PatchFormData) => {
     if (selectedPatch) {
-      updatePatch({ ...data, id: selectedPatch.id });
+      // Keep immutable EPSS/KEV evidence when editable patch fields change.
+      updatePatch({ ...selectedPatch, ...data, id: selectedPatch.id });
        toast({ title: "Patch Updated", description: "The patch has been updated successfully." });
     } else {
       createPatch(data);

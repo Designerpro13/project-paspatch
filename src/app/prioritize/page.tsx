@@ -149,26 +149,109 @@ export default function PrioritizePage() {
           <Card>
             <CardHeader>
               <CardTitle>Prioritized Patch Recommendations</CardTitle>
+              <CardDescription>
+                Risk is calculated from preliminary severity plus live{" "}
+                <a
+                  href="https://www.first.org/epss/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium underline"
+                >
+                  FIRST EPSS
+                </a>{" "}
+                and{" "}
+                <a
+                  href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium underline"
+                >
+                  CISA KEV
+                </a>{" "}
+                evidence.
+              </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+              {result.some(rec => rec.warnings?.length) && (
+                <Alert>
+                  <AlertTitle>Enrichment notes</AlertTitle>
+                  <AlertDescription>
+                    <ul className="list-disc space-y-1 pl-4">
+                      {Array.from(
+                        new Set(result.flatMap(rec => rec.warnings ?? []))
+                      ).map(warning => (
+                        <li key={warning}>{warning}</li>
+                      ))}
+                    </ul>
+                  </AlertDescription>
+                </Alert>
+              )}
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Priority</TableHead>
+                    <TableHead>Priority / Score</TableHead>
                     <TableHead>Service</TableHead>
                     <TableHead>Current Version</TableHead>
+                    <TableHead>CVE intelligence</TableHead>
                     <TableHead>Recommendation</TableHead>
                     <TableHead>Rationale</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {result.map((rec, index) => (
-                    <TableRow key={index}>
-                      <TableCell><Badge variant={getBadgeVariant(rec.priority)}>{rec.priority}</Badge></TableCell>
-                      <TableCell>{rec.service}</TableCell>
-                      <TableCell>{rec.currentVersion}</TableCell>
-                      <TableCell>{rec.recommendedPatch}</TableCell>
-                      <TableCell>{rec.rationale}</TableCell>
+                    <TableRow key={`${rec.service}-${rec.currentVersion}-${index}`}>
+                      <TableCell className="align-top">
+                        <div className="space-y-2">
+                          <Badge variant={getBadgeVariant(rec.priority)}>
+                            {rec.priority}
+                          </Badge>
+                          <div className="font-mono text-sm font-semibold">
+                            {rec.riskScore ?? "—"}/100
+                          </div>
+                          {rec.riskSummary && (
+                            <p className="min-w-48 text-xs text-muted-foreground">
+                              {rec.riskSummary}
+                            </p>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="align-top">{rec.service}</TableCell>
+                      <TableCell className="align-top">{rec.currentVersion}</TableCell>
+                      <TableCell className="min-w-56 align-top">
+                        {rec.cveEvidence?.length ? (
+                          <div className="space-y-3">
+                            {rec.cveEvidence.map(evidence => (
+                              <div key={evidence.cveId} className="space-y-1">
+                                <div className="flex flex-wrap gap-1">
+                                  <Badge variant="outline">{evidence.cveId}</Badge>
+                                  {evidence.knownExploited && (
+                                    <Badge variant="destructive">CISA KEV</Badge>
+                                  )}
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                  EPSS:{" "}
+                                  {evidence.epssScore === null
+                                    ? "unavailable"
+                                    : `${(evidence.epssScore * 100).toFixed(2)}%`}
+                                  {evidence.epssPercentile !== null &&
+                                    ` • ${(evidence.epssPercentile * 100).toFixed(1)}th percentile`}
+                                </p>
+                                {evidence.kevDueDate && (
+                                  <p className="text-xs font-medium text-destructive">
+                                    KEV remediation due: {evidence.kevDueDate}
+                                  </p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">
+                            No confident CVE match
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell className="align-top">{rec.recommendedPatch}</TableCell>
+                      <TableCell className="min-w-64 align-top">{rec.rationale}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

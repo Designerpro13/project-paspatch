@@ -8,14 +8,14 @@ Key features include an AI-driven patch advisor that prioritizes remediation, an
 
 To get started with PatchWise, follow these steps:
 
-1.  **Clone the repository:**
+1. **Clone the repository:**
 
     ```bash
     git clone https://github.com/Designerpro13/project-paspatch/
     cd PatchWise
     ```
 
-2.  **Install dependencies:**
+2. **Install dependencies:**
 
     ```bash
     npm install
@@ -23,11 +23,11 @@ To get started with PatchWise, follow these steps:
     yarn install
     ```
 
-3.  **Configure API Keys:**
+3. **Configure API Keys:**
 
     Create a `.env.local` file in the project root and add your API keys for the AI services used by the platform. Refer to the `documentation.md` file for detailed instructions on API key configuration.
 
-4.  **Run the application:**
+4. **Run the application:**
 
     ```bash
     npm run dev
@@ -39,15 +39,13 @@ To get started with PatchWise, follow these steps:
 
 ## Features
 
-*   AI-powered vulnerability data ingestion and normalization
-*   Intelligent vulnerability asset mapping
-*   AI-driven patch recommendations and prioritization
-*   Interactive vulnerability chat
-*   Customizable security reports
-*   Nmap Service Scan parsing
+* AI-powered vulnerability data ingestion and normalization
+* Intelligent vulnerability asset mapping
+* AI-driven patch recommendations and prioritization
+* Interactive vulnerability chat
+* Customizable security reports
+* Nmap Service Scan parsing
 
 ## Documentation
 
 For more detailed information on installation, configuration, usage, and limitations, please refer to the [documentation.md](documentation.md) file.
-
-
