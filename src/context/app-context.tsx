@@ -148,7 +148,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
   
   const addVulnerabilities = (newVulnerabilities: Omit<Vulnerability, 'status' | 'id'>[]) => {
-    const vulnerabilitiesWithStatus = newVulnerabilities.map(v => ({...v, id: v.id || uuidv4(), status: 'New' as VulnerabilityStatus}))
+    const vulnerabilitiesWithStatus: Vulnerability[] = newVulnerabilities.map(v => ({...v, id: v.id || uuidv4(), status: 'New' as VulnerabilityStatus} as Vulnerability))
     setVulnerabilities(prev => [...prev, ...vulnerabilitiesWithStatus]);
   }
 

@@ -223,7 +223,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 <Collapsible key={group.title} defaultOpen={group.items.some(item => pathname.startsWith(item.href) && (item.href !== '/' || pathname === '/'))}>
                     <CollapsibleTrigger asChild>
                         <div>
-                            <SidebarMenuButton className="w-full justify-start" variant="ghost" size="sm" tooltip={group.title}>
+                            <SidebarMenuButton className="w-full justify-start" variant="default" size="sm" tooltip={group.title}>
                                 <group.icon className="size-4" />
                                 <span className="w-full text-left">{group.title}</span>
                             </SidebarMenuButton>
